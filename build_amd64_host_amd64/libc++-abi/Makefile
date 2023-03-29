@@ -1,0 +1,54 @@
+PROJECT:=libcxxabi
+SRC_DIR:=$(shell pwd)/../../git/llvm-project/libcxxabi
+BUILT_DATE:=$(shell date +%Y%m%d)
+
+include ../git.mk
+
+INSTALL_DIR:=$(shell pwd)/$(PROJECT)-trunk-$(GIT_COMMIT_SHORT_ID)
+
+
+.PHONY:
+all: $(PROJECT).configure $(PROJECT).build $(PROJECT).install $(PROJECT).makedeb
+
+build_dir:
+	mkdir build_dir
+
+
+
+define configure
+	cd build_dir && cmake $(SRC_DIR) \
+						-DCMAKE_BUILD_TYPE=Release \
+						-DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/usr/local \
+						-DLIBCXX_INCLUDE_TESTS=OFF \
+						-DLIBCXX_INCLUDE_BENCHMARKS=OFF \
+						-DLIBCXXABI_LIBCXX_INCLUDES=/usr/local/include/c++/v1 \
+						\
+						-DCMAKE_C_COMPILER=clang \
+						-DCMAKE_CXX_COMPILER=clang++ \
+
+endef
+
+include ../default_configure.mk
+
+define build
+	+ cd build_dir && make
+
+endef
+
+include ../default_build.mk
+
+include ../default_install.mk
+
+include ../makedeb.mk
+
+PACKAGE_NAME:=libcxxabi-trunk
+DEB_NAME:=libcxxabi-trunk-dev_$(GIT_COMMIT_DATE)_$(GIT_COMMIT_SHORT_ID).0_amd64.deb
+DEB_VERSION:=$(GIT_COMMIT_DATE).$(GIT_COMMIT_TIME)
+
+.PHONY:
+$(PROJECT).makedeb.nodep:
+	$(call make_deb)
+
+.PHONY:
+$(PROJECT).makedeb: $(PROJECT).install
+	$(call make_deb)

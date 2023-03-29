@@ -1,0 +1,17 @@
+include ../architecture.mk
+
+define make_deb
+	cd $(INSTALL_DIR) && mkdir -p ./DEBIAN
+	echo "Package: $(DEB_NAME)\
+		\nVersion: $(BUILT_DATE)\
+		\nArchitecture: $(ARCHITECTURE)\
+		\nMaintainer: Peter Nee\
+		\nInstalled-Size: $(shell du -s $(INSTALL_DIR)/usr | awk '{print $$1}')\
+		\nPriority: extra\
+		\nDescription: built-date: $(BUILT_DATE)\
+		\n             git-commit-id: $(GIT_COMMIT_ID)"\
+	 > $(INSTALL_DIR)/DEBIAN/control
+	chmod 755 $(INSTALL_DIR)/DEBIAN/control
+
+	dpkg-deb -b -Zxz -z9 $(INSTALL_DIR) $(DEB_NAME)
+endef
