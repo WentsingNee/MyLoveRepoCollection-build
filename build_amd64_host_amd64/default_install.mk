@@ -1,7 +1,18 @@
+
 .PHONY:
 $(PROJECT).install.nodep:
-	+ cd build_dir && make install
+	+ cd $(BUILD_DIR) && make install
 
 .PHONY:
 $(PROJECT).install: $(PROJECT).build
-	+ cd build_dir && make install
+	+ cd $(BUILD_DIR) && make install
+
+.PHONY:
+$(PROJECT).install.dyn.nodep:
+ifeq ($(BUILD_SHARED_LIBS), true)
+	+ cd $(BUILD_DIR)_dyn && make install
+endif
+
+.PHONY:
+$(PROJECT).install.dyn: $(PROJECT).install.dyn.nodep
+
