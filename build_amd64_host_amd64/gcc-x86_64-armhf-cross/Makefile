@@ -1,93 +1,75 @@
+
 PROJECT:=gcc
 SRC_DIR:=$(shell pwd)/../../git/$(PROJECT)
 GCC_VER:=$(shell cat $(SRC_DIR)/gcc/BASE-VER)
-BUILT_DATE:=$(shell date +%Y%m%d)
 
 include ../git.mk
+include ../makedeb.mk
 
-INSTALL_DIR:=$(shell pwd)/$(PROJECT)-trunk-$(GIT_COMMIT_SHORT_ID)
-
-
-.PHONY:
-all: $(PROJECT).configure $(PROJECT).build $(PROJECT).install $(PROJECT).makedeb
-
-build_dir:
-	mkdir build_dir
-
-
-
-define configure
-	cd build_dir && $(SRC_DIR)/configure -v \
-				--prefix=$(INSTALL_DIR)/usr/ \
-				--build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-linux-gnueabihf \
-				--program-prefix=arm-linux-gnueabihf- --program-suffix=-$(GCC_VER) \
-				--enable-languages=c,c++ \
-				--disable-werror --enable-default-pie \
-				--with-sysroot=/ --with-headers=/usr/arm-linux-gnueabihf/include --with-libs=/usr/arm-linux-gnueabihf/lib \
-				--with-system-zlib --with-target-system-zlib \
-				--enable-shared --disable-checking --disable-multilib \
-				--disable-bootstrap \
-				--without-long-double-128 \
-				--with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=thumb
+BUILT_DATE:=$(shell date +%Y%m%d)
+WORKING_DIR:=$(shell pwd)/$(PROJECT)-armhf-trunk_$(BUILT_DATE)_$(GIT_COMMIT_DATE)_$(GIT_COMMIT_SHORT_ID)
+BUILD_DIR:=$(WORKING_DIR)/BUILD
+INSTALL_DIR:=$(WORKING_DIR)/INSTALL
+PACKAGE_DIR:=$(WORKING_DIR)
+PACKAGE_NAME:=$(PROJECT)-armhf-trunk
+DEB_NAME:=$(PROJECT)-armhf-trunk_$(GIT_COMMIT_DATE)_$(GIT_COMMIT_SHORT_ID).0_$(ARCHITECTURE).deb
+DEB_VERSION:=$(GIT_COMMIT_DATE).$(GIT_COMMIT_TIME)
 
 
-endef
+CONFIGURATION_TYPE:=CONFIGURE
 
-.PHONY:
-$(PROJECT).configure.nodep:
-	$(call configure)
+export CC=/usr/local/bin/gcc
+export CXX=/usr/local/bin/g++
 
-.PHONY:
-$(PROJECT).configure: build_dir
-	$(call configure)
+CONFIGURATION_ARGS:= \
+		-v \
+		--prefix=$(INSTALL_DIR)/usr/ \
+		--build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-linux-gnueabihf \
+		--program-prefix=arm-linux-gnueabihf- --program-suffix=-$(GCC_VER) \
+		--enable-languages=c,c++ \
+		--disable-werror --enable-default-pie \
+		--with-sysroot=/ --with-headers=/usr/arm-linux-gnueabihf/include --with-libs=/usr/arm-linux-gnueabihf/lib \
+		--with-system-zlib --with-target-system-zlib \
+		--enable-shared --disable-checking --disable-multilib \
+		--disable-bootstrap \
+		--without-long-double-128 \
+		--with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-mode=thumb \
 
 
+MAKE_ARGS:= \
+		BOOT_CFLAGS='-O3' BOOT_CXXFLAGS='-O3' \
+		CFLAGS_FOR_TARGET='-O3' CXXFLAGS_FOR_TARGET='-O3' \
+		CFLAGS_FOR_BUILD='-O3' CXXFLAGS_FOR_BUILD='-O3' \
+		CFLAGS='-O3' CXXFLAGS='-O3'
 
-define build
-	+ cd build_dir && make \
-					BOOT_CFLAGS='-O2 ' BOOT_CXXFLAGS='-O2 ' \
-					CFLAGS_FOR_TARGET='-O2 ' CXXFLAGS_FOR_TARGET='-O2 ' \
-					CFLAGS_FOR_BUILD='-O2 ' CXXFLAGS_FOR_BUILD='-O2 ' \
-					CFLAGS='-O2 ' CXXFLAGS='-O2 '
-					LIBGCC_FLAGS=''
 
-endef
-
-.PHONY:
-$(PROJECT).build.nodep:
-	$(call build)
-
-.PHONY:
-$(PROJECT).build: $(PROJECT).configure
-	$(call build)
+include ../default_clean.mk
+include ../default_configure.mk
+include ../default_build.mk
 
 
 
 .PHONY:
 $(PROJECT).install.nodep:
-	+ cd build_dir && make install
-	rm -rf $(INSTALL_DIR)/usr/arm-linux-gnueabihf/lib
-	rm -rf $(INSTALL_DIR)/usr/arm-linux-gnueabihf/sys-include
-	rm -rf $(INSTALL_DIR)/usr/share/info/dir
+	+ cd $(BUILD_DIR) && make install
+	mkdir -p $(INSTALL_DIR)_trush
+	mv $(INSTALL_DIR)/usr/arm-linux-gnueabihf/lib           $(INSTALL_DIR)_trush
+	mv $(INSTALL_DIR)/usr/arm-linux-gnueabihf/sys-include   $(INSTALL_DIR)_trush
+	mv $(INSTALL_DIR)/usr/share/info/dir                    $(INSTALL_DIR)_trush
 
 .PHONY:
 $(PROJECT).install: $(PROJECT).build
-	+ cd build_dir && make install
-	rm -rf $(INSTALL_DIR)/usr/arm-linux-gnueabihf/lib
-	rm -rf $(INSTALL_DIR)/usr/arm-linux-gnueabihf/sys-include
-	rm -rf $(INSTALL_DIR)/usr/share/info/dir
-
-
-include ../makedeb.mk
-
-PACKAGE_NAME:=gcc-armhf-trunk
-DEB_NAME:=gcc-armhf-trunk_$(GIT_COMMIT_DATE)_$(GIT_COMMIT_SHORT_ID).0_$(ARCHITECTURE).deb
-DEB_VERSION:=$(GIT_COMMIT_DATE).$(GIT_COMMIT_TIME)
+	+ cd $(BUILD_DIR) && make install
+	mkdir -p $(INSTALL_DIR)_trush
+	mv $(INSTALL_DIR)/usr/arm-linux-gnueabihf/lib           $(INSTALL_DIR)_trush
+	mv $(INSTALL_DIR)/usr/arm-linux-gnueabihf/sys-include   $(INSTALL_DIR)_trush
+	mv $(INSTALL_DIR)/usr/share/info/dir                    $(INSTALL_DIR)_trush
 
 .PHONY:
-$(PROJECT).makedeb.nodep:
-	$(call make_deb)
+$(PROJECT).install.dyn.nodep:
 
 .PHONY:
-$(PROJECT).makedeb: $(PROJECT).install
-	$(call make_deb)
+$(PROJECT).install.dyn:
+
+
+include ../default_all.mk

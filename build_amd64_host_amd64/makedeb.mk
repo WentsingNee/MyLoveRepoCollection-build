@@ -15,5 +15,24 @@ define make_deb
 	 > $(INSTALL_DIR)/DEBIAN/control
 	chmod 755 $(INSTALL_DIR)/DEBIAN/control
 
-	dpkg-deb -b -Zxz -z9 $(INSTALL_DIR) $(DEB_NAME)
+	dpkg-deb -b -Zxz -z9 $(INSTALL_DIR) $(PACKAGE_DIR)/$(DEB_NAME)
 endef
+
+.PHONY:
+$(PROJECT).makedeb.nodep:
+	$(call make_deb)
+
+
+ifeq ($(BUILD_SHARED_LIBS), true)
+
+.PHONY:
+$(PROJECT).makedeb: $(PROJECT).install $(PROJECT).install.dyn
+	$(call make_deb)
+
+else
+
+.PHONY:
+$(PROJECT).makedeb: $(PROJECT).install
+	$(call make_deb)
+
+endif

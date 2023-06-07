@@ -1,38 +1,38 @@
+
 PROJECT:=co2
 SRC_DIR:=$(shell pwd)/../../git/$(PROJECT)
+
+include ../git.mk
+include ../makedeb.mk
+
 BUILT_DATE:=$(shell date +%Y%m%d)
-GIT_COMMIT_ID:=$(shell cd $(SRC_DIR) && git rev-parse HEAD)
-INSTALL_DIR:=$(shell pwd)/$(PROJECT)-trunk-$(GIT_COMMIT_ID)
-DEB_NAME:=libco2-trunk-dev
-
-.PHONY:
-all: \
-		$(PROJECT).configure \
-		$(PROJECT).build \
-		$(PROJECT).install $(PROJECT).makedeb
-
-build_dir:
-	mkdir build_dir
-
-.PHONY:
-$(PROJECT).configure: build_dir
-	cd build_dir && cmake $(SRC_DIR) \
-					-DCMAKE_BUILD_TYPE=Release \
-					-DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/usr/local \
-
-.PHONY:
-$(PROJECT).build: $(PROJECT).configure
-	+ cd build_dir && make
+WORKING_DIR:=$(shell pwd)/$(PROJECT)-trunk_$(BUILT_DATE)_$(GIT_COMMIT_DATE)_$(GIT_COMMIT_SHORT_ID)
+BUILD_DIR:=$(WORKING_DIR)/BUILD
+INSTALL_DIR:=$(WORKING_DIR)/INSTALL
+PACKAGE_DIR:=$(WORKING_DIR)
+PACKAGE_NAME:=lib$(PROJECT)-trunk-dev
+DEB_NAME:=lib$(PROJECT)-trunk-dev_$(GIT_COMMIT_DATE)_$(GIT_COMMIT_SHORT_ID).0_$(ARCHITECTURE).deb
+DEB_VERSION:=$(GIT_COMMIT_DATE).$(GIT_COMMIT_TIME)
 
 
+CONFIGURATION_TYPE:=CMAKE
+BUILD_SHARED_LIBS:=false
 
-.PHONY:
-$(PROJECT).install: $(PROJECT).build
-	+ cd build_dir && make install
+BASIC_CONFIGURATION_ARGS:= \
+		$(SRC_DIR) \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/usr/local \
+
+CONFIGURATION_ARGS:= \
+		$(BASIC_CONFIGURATION_ARGS) \
+		-DBUILD_SHARED_LIBS=False
+
+MAKE_ARGS:= \
+		all
 
 
-include ../make_deb.mk
-
-.PHONY:
-$(PROJECT).makedeb: $(PROJECT).install
-	$(call make_deb)
+include ../default_clean.mk
+include ../default_configure.mk
+include ../default_build.mk
+include ../default_install.mk
+include ../default_all.mk
