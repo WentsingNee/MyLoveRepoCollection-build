@@ -1,0 +1,2 @@
+#!/bin/bash
+`dirname $0`/clang++ --target=aarch64-linux-gnu -I/usr/aarch64-linux-gnu/include -L/usr/aarch64-linux-gnu/lib "$@"
