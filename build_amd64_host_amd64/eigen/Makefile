@@ -26,12 +26,9 @@ BASIC_CONFIGURATION_ARGS:= \
 CONFIGURATION_ARGS:= \
 		$(BASIC_CONFIGURATION_ARGS)
 
-MAKE_ARGS:= \
-		all
-
 
 include ../default_clean.mk
 include ../default_configure.mk
-include ../default_build.mk
-include ../default_install.mk
+include ../cmake_build.mk
+include ../cmake_install.mk
 include ../default_all.mk

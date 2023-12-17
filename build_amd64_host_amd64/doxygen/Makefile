@@ -28,12 +28,9 @@ CONFIGURATION_ARGS:= \
 		$(BASIC_CONFIGURATION_ARGS) \
 		-DBUILD_SHARED_LIBS=False
 
-MAKE_ARGS:= \
-		all
-
 
 include ../default_clean.mk
 include ../default_configure.mk
-include ../default_build.mk
-include ../default_install.mk
+include ../cmake_build.mk
+include ../cmake_install.mk
 include ../default_all.mk

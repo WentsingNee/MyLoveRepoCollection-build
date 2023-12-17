@@ -38,21 +38,14 @@ CONFIGURATION_ARGS:= \
 #		-DCMAKE_CXX_COMPILER=g++ \
 
 
-MAKE_ARGS:= \
-		all
-
-MAKE_ARGS.dyn:= \
-		all
-
-
 include ../default_clean.mk
 include ../default_configure.mk
-include ../default_build.mk
+include ../cmake_build.mk
 
 
 
 define install
-	+ cd $(BUILD_DIR) && make install
+	+ cmake --build $(BUILD_DIR) --target install
 	cp ./link/aarch64-linux-gnu-clang++ $(INSTALL_DIR)/usr/local/bin/aarch64-linux-gnu-clang++
 	chmod +x $(INSTALL_DIR)/usr/local/bin/aarch64-linux-gnu-clang++
 	cp ./link/arm-linux-gnueabihf-clang++ $(INSTALL_DIR)/usr/local/bin/arm-linux-gnueabihf-clang++

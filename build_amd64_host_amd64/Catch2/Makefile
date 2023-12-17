@@ -33,15 +33,9 @@ CONFIGURATION_ARGS.dyn:= \
 		$(BASIC_CONFIGURATION_ARGS) \
 		-DBUILD_SHARED_LIBS=True
 
-MAKE_ARGS:= \
-		all
-
-MAKE_ARGS.dyn:= \
-		all
-
 
 include ../default_clean.mk
 include ../default_configure.mk
-include ../default_build.mk
-include ../default_install.mk
+include ../cmake_build.mk
+include ../cmake_install.mk
 include ../default_all.mk

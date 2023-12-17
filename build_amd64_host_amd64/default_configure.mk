@@ -1,7 +1,6 @@
 
 define configure.cmake
-	mkdir -p $(BUILD_DIR); \
-	cd $(BUILD_DIR) && cmake $(CONFIGURATION_ARGS); \
+	cmake -S . -B $(BUILD_DIR) -DCPACK_PACKAGE_NAME="$(PACKAGE_NAME)" -DCPACK_PACKAGE_CONTACT="Wentsing Nee" $(CONFIGURATION_ARGS); \
 	echo; \
 	echo; \
 	echo; \
@@ -9,8 +8,7 @@ define configure.cmake
 endef
 
 define configure.cmake.dyn
-	mkdir -p $(BUILD_DIR)_dyn; \
-	cd $(BUILD_DIR)_dyn && cmake $(CONFIGURATION_ARGS.dyn); \
+	cmake -S . -B $(BUILD_DIR)_dyn -DCPACK_PACKAGE_NAME="$(PACKAGE_NAME)" -DCPACK_PACKAGE_CONTACT="Wentsing Nee" $(CONFIGURATION_ARGS.dyn); \
 	echo; \
 	echo; \
 	echo; \
