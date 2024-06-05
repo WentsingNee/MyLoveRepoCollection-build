@@ -21,6 +21,7 @@ CONFIGURATION_TYPE:=CMAKE
 
 CONFIGURATION_ARGS:= \
 		$(SRC_DIR) \
+		-G Ninja \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/usr/local \
 		-DBUILD_SHARED_LIBS=True \
@@ -35,8 +36,8 @@ MAKE_ARGS.dyn:= \
 
 include ../default_clean.mk
 include ../default_configure.mk
-include ../default_build.mk
-include ../default_install.mk
+include ../cmake_build.mk
+include ../cmake_install.mk
 include ../default_all.mk
 
 
@@ -47,3 +48,5 @@ $(PROJECT).reuse:
 	  mkdir -p $(WORKING_DIR); \
 	  cp -r $$OLD_WORKING_DIR/BUILD $(WORKING_DIR); \
 
+# requirement:
+# openssl   libssl-ocaml-dev

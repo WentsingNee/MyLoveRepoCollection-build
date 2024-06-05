@@ -19,17 +19,18 @@ CONFIGURATION_TYPE:=CMAKE
 
 CONFIGURATION_ARGS:= \
 		$(SRC_DIR)/llvm \
+		-G Ninja \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/usr/local \
 		-DBUILD_SHARED_LIBS=True \
 		-DCMAKE_CXX_STANDARD=17 \
 		-DLLVM_ENABLE_PROJECTS="clang;lld;lldb" \
-		-DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;openmp" \
+		-DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;openmp" \
 		-DLLVM_INCLUDE_EXAMPLES=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF \
 		-DLLVM_INCLUDE_BENCHMARKS=OFF \
 		-DLLVM_TARGETS_TO_BUILD="AArch64;ARM;RISCV;X86" \
-		-DLLVM_ENABLE_LIBCXX=ON \
+		-DLLVM_ENABLE_LIBCXX=OFF \
 		-DCMAKE_C_COMPILER=clang \
 		-DCMAKE_CXX_COMPILER=clang++ \
 
@@ -38,21 +39,15 @@ CONFIGURATION_ARGS:= \
 #		-DCMAKE_CXX_COMPILER=g++ \
 
 
-MAKE_ARGS:= \
-		all
-
-MAKE_ARGS.dyn:= \
-		all
-
-
 include ../default_clean.mk
 include ../default_configure.mk
-include ../default_build.mk
+include ../cmake_build.mk
 
 
 
 define install
-	+ cd $(BUILD_DIR) && make install
+#	+ cd $(BUILD_DIR) && make install
+	+ cmake --build $(BUILD_DIR) --target install
 	cp ./link/aarch64-linux-gnu-clang++ $(INSTALL_DIR)/usr/local/bin/aarch64-linux-gnu-clang++
 	chmod +x $(INSTALL_DIR)/usr/local/bin/aarch64-linux-gnu-clang++
 	cp ./link/arm-linux-gnueabihf-clang++ $(INSTALL_DIR)/usr/local/bin/arm-linux-gnueabihf-clang++
