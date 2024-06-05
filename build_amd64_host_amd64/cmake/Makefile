@@ -47,3 +47,5 @@ $(PROJECT).reuse:
 	  mkdir -p $(WORKING_DIR); \
 	  cp -r $$OLD_WORKING_DIR/BUILD $(WORKING_DIR); \
 
+# requirement:
+# openssl   libssl-ocaml-dev
